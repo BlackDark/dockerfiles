@@ -6,14 +6,13 @@ on:
     - cron: "0 1 * * *"
   push:
     branches:
-      - "master"
+      - "main"
       - "dev"
-      - "experimental"
     tags:
       - "v*.*.*"
   pull_request:
     branches:
-      - "master"
+      - "main"
       - "dev"
 
 permissions:
