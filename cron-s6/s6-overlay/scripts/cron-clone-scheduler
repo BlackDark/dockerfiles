@@ -1,0 +1,3 @@
+#!/bin/sh -e
+cp /app/schedules/* /etc/cron.d/
+chown -R root:root /etc/cron.d
