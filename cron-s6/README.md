@@ -14,3 +14,12 @@ docker run --rm \
     -v $(pwd)/execute.sh:/app/execute.sh \
     -e HALLO=test test:test
 ```
+
+## TODO alpine dind cron
+
+```bash
+docker run --rm \
+    -v $(pwd)/crontab:/etc/crontabs/root \
+    -v $(pwd)/execute.sh:/app/execute.sh \
+    -e HALLO=test --entrypoint="crond" --init docker:dind -f -L /dev/stdout 
+```
