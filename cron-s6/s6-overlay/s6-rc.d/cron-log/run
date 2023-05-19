@@ -1,3 +1,0 @@
-#!/bin/sh
-exec echo dude
-#exec logutil-service /var/log/cron

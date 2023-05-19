@@ -1,0 +1,2 @@
+* * * * * root /app/execute.sh >> /var/log/cron.log 2>&1
+@reboot root /app/execute.sh >> /var/log/cron.log 2>&1

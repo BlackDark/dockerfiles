@@ -1,1 +1,3 @@
-echo "DUDE"
+echo "Hi"
+echo $HOME
+echo $HALLO
