@@ -1,0 +1,3 @@
+
+0 0 * * 0 root /app/bitrix24.sh >> /var/log/cron.log 2>&1
+@reboot root /app/bitrix24.sh >> /var/log/cron.log 2>&1
