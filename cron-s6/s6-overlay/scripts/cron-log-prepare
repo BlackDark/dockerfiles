@@ -1,0 +1,12 @@
+#!/bin/sh -e
+mkdir -p /var/log/cron
+chown nobody:nogroup /var/log/cron
+chmod 02755 /var/log/cron
+
+mkdir -p /var/log/cron-test
+chown nobody:nogroup /var/log/cron-test
+chmod 02755 /var/log/cron-test
+
+touch /var/log/cron.log
+chown nobody:nogroup /var/log/cron.log
+chmod 02755 /var/log/cron.log

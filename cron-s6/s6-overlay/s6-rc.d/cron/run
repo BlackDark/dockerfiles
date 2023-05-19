@@ -1,0 +1,10 @@
+#!/bin/sh
+#env >> /etc/environment
+
+#exec 2>&1
+#sleep 3
+#echo "HI 1"
+echo "Peop"
+fdmove 2 1
+exec echo hi2
+#exec tail -f /var/log/cron.log
