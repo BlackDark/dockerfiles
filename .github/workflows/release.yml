@@ -26,6 +26,7 @@ jobs:
       matrix:
         folder:
           - cron-s6
+          - speedtester
     runs-on: ubuntu-latest
     steps:
       # Get the repositery's code

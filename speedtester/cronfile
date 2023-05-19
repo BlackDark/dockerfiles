@@ -1,0 +1,9 @@
+# change server for speed test by altering value of argument "-s"
+# 3199 - NEXT LAYER GmbH, Vienna, Austria
+# https://crontab.guru/#*/1_*_*_*_*
+# -s 4462 = Freisbach is the auto selected one
+# Every hour. For every half our */30
+# 31448 Telekom Frankfurt
+
+0 * * * * root /usr/bin/speedtest --accept-license --accept-gdpr -s 31448 -f json | tee /var/log/cron.log | curl -H 'Content-Type: application/json' -X POST --data-binary @- http://telegraf:8080/telegraf
+@reboot root  /usr/bin/speedtest --accept-license --accept-gdpr -s 31448 -f json | tee /var/log/cron.log | curl -H 'Content-Type: application/json' -X POST --data-binary @- http://telegraf:8080/telegraf
