@@ -97,6 +97,7 @@ jobs:
           - speedtester
           - bitrix24-keepalive
           - webde-keepalive
+          - cf-record-refresh
     runs-on: ubuntu-latest
     steps:
       # Get the repositery's code
