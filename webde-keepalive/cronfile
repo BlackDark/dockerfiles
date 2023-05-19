@@ -1,0 +1,2 @@
+0 * * * 0 root /app/curler.sh >> /var/log/cron.log 2>&1
+@reboot root /app/curler.sh >> /var/log/cron.log 2>&1

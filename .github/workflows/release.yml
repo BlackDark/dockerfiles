@@ -28,6 +28,7 @@ jobs:
           - cron-s6
           - speedtester
           - bitrix24-keepalive
+          - webde-keepalive
     runs-on: ubuntu-latest
     steps:
       # Get the repositery's code
