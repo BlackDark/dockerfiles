@@ -98,6 +98,7 @@ jobs:
           - bitrix24-keepalive
           - webde-keepalive
           - cf-record-refresh
+          - cron-dind
     runs-on: ubuntu-latest
     steps:
       # Get the repositery's code
