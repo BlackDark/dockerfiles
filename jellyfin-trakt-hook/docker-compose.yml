@@ -1,12 +1,12 @@
 services:
   server:
     build: .
-    image: blackdark93/trakt-syncer:latest
+    image: blackdark93/dockerfiles-jellyfin-trakt-hook:latest
     ports:
       - "5002:5001"
+    env_file:
+      - .env
     environment:
-      CLIENT_ID: ""
-      CLIENT_SECRET: ""
       CONFIG_DIR: "/config"
     volumes:
       - "./config:/config"

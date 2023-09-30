@@ -39,9 +39,9 @@ const loadConfig = () => {
 const authenticate = async () => {
   try {
     const result = await trakt.get_codes();
-
-    console.log(result.verification_url);
-    console.log(result.user_code);
+    console.log(
+      `Use Code: ${result.user_code} with URL: ${result.verification_url}`
+    );
     await trakt.poll_access(result);
   } catch (error) {
     console.log(error);
@@ -62,10 +62,14 @@ const syncToTrakt = async (body) => {
   const completed = body.completed;
 
   if (!completed) {
+    console.log(
+      `Provided video not completed. Ignoring. ${JSON.stringify(body)}`
+    );
     return "Not completed. Ignoring";
   }
 
   if (!tvdb && !imdb) {
+    console.log(`No imdb and tvdb provided. ${JSON.stringify(body)}`);
     return "No imdb and tvdb provided";
   }
 
@@ -168,14 +172,14 @@ const syncToTrakt = async (body) => {
     id: traktId || imdb || tvdb,
   });
 
-  console.log(historyType, imdb, tvdb);
-
   response.history = result;
 
-  if (result.length < 0) {
+  if (result.length <= 0) {
+    console.log(`Add watched: ${JSON.stringify(body)}`);
     const watchedResult = await addWatched();
     response.addToWatched = watchedResult;
   }
+
   return response;
 };
 
@@ -186,6 +190,10 @@ router.post("/", async (req, res) => {
     completed: req.body.completed === "True",
     type: req.body.type,
   };
+
+  console.log(
+    `Request: ${JSON.stringify(req.body)} - ${JSON.stringify(req.headers)}`
+  );
 
   const result = await syncToTrakt(expected);
   res.json(result);
