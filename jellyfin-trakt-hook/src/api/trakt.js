@@ -180,7 +180,14 @@ const syncToTrakt = async (body) => {
 };
 
 router.post("/", async (req, res) => {
-  const result = await syncToTrakt(req.body);
+  const expected = {
+    imdb: req.body.imdb || null,
+    tvdb: req.body.tvdb || null,
+    completed: req.body.completed === "True",
+    type: req.body.type,
+  };
+
+  const result = await syncToTrakt(expected);
   res.json(result);
 });
 
