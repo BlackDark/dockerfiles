@@ -1,0 +1,12 @@
+services:
+  server:
+    build: .
+    image: blackdark93/trakt-syncer:latest
+    ports:
+      - "5002:5001"
+    environment:
+      CLIENT_ID: ""
+      CLIENT_SECRET: ""
+      CONFIG_DIR: "/config"
+    volumes:
+      - "./config:/config"

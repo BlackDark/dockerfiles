@@ -99,6 +99,7 @@ jobs:
           - webde-keepalive
           - cf-record-refresh
           - cron-dind
+          - jellyfin-trakt-hook
     runs-on: ubuntu-latest
     steps:
       # Get the repositery's code
