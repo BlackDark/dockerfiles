@@ -1,6 +1,7 @@
 const express = require("express");
 const Trakt = require("trakt.tv");
 const fs = require("fs");
+const internal = require("stream");
 
 const router = express.Router();
 
@@ -16,6 +17,8 @@ let options = {
 const trakt = new Trakt(options);
 
 let CACHED_TOKEN = null;
+let TRAKT_TOKEN_IMPORTED = false;
+let timeout = undefined;
 
 const storeConfig = (config) => {
   fs.writeFileSync(`${CONFIG_DIR}/trakt.json`, JSON.stringify(config));
@@ -44,6 +47,7 @@ const authenticate = async () => {
       `Use Code: ${result.user_code} with URL: ${result.verification_url}`
     );
     await trakt.poll_access(result);
+    console.log("[Trakt authenticate] Successfully authenticated device.");
   } catch (error) {
     console.error(
       `[Trakt authenticate] Trakt authentication error: ${JSON.stringify(
@@ -54,10 +58,71 @@ const authenticate = async () => {
 
   const newToken = trakt.export_token();
 
-  CACHED_TOKEN = newToken;
-  console.log("[Trakt authenticate] Requested new token");
   storeConfig(newToken);
+  console.log("[Trakt authenticate] Exported token to file.");
+
+  CACHED_TOKEN = newToken;
+  TRAKT_TOKEN_IMPORTED = true;
   return newToken;
+};
+
+const validateToken = async () => {
+  if (!CACHED_TOKEN) {
+    if (!loadConfig()) {
+      await authenticate();
+    }
+  }
+
+  if (!TRAKT_TOKEN_IMPORTED) {
+    console.log("[Trakt validateToken] Import token into trakt ...");
+    try {
+      const newTokens = await trakt.import_token(CACHED_TOKEN);
+      console.log("[Trakt validateToken] Imported token");
+
+      if (JSON.stringify(CACHED_TOKEN) !== JSON.stringify(newTokens)) {
+        console.log("[Trakt validateToken] Refreshed token");
+        storeConfig(newTokens);
+        CACHED_TOKEN = newTokens;
+      }
+    } catch (err) {
+      console.log(`Failed loading token: ${JSON.stringify(err)}`);
+      throw err;
+    }
+  }
+
+  // 24 hours before expiry
+  const expiresInMs = new Date(trakt._authentication.expires) - new Date();
+
+  if (timeout == null) {
+    let timeoutms = expiresInMs - 24 * 60 * 60 * 1000;
+    timeoutms = Math.max(timeoutms, 0);
+    // refresh at least every week
+    timeoutms = Math.min(timeoutms, 7 * 24 * 60 * 60 * 1000);
+
+    console.log(
+      `[Trakt validateToken] Next token refresh in ${timeoutms / 1000} seconds`
+    );
+    timeout = setTimeout(async () => {
+      console.log(
+        "[Trakt validateToken] Timeout triggered. Refreshing token ..."
+      );
+
+      try {
+        const refreshedToken = await trakt.refresh_token();
+        const newToken = await trakt.export_token();
+
+        if (JSON.stringify(CACHED_TOKEN) !== JSON.stringify(newToken)) {
+          console.log("[Trakt validateToken] Refreshed token");
+          storeConfig(newToken);
+          CACHED_TOKEN = newToken;
+        }
+      } catch (err) {
+        console.log(`Failed refreshing token: ${JSON.stringify(err)}`);
+        CACHED_TOKEN = undefined;
+      }
+      timeout = undefined;
+    }, timeoutms);
+  }
 };
 
 const syncToTrakt = async (body) => {
@@ -82,20 +147,7 @@ const syncToTrakt = async (body) => {
     return "No imdb and tvdb provided";
   }
 
-  if (!CACHED_TOKEN) {
-    if (!loadConfig()) {
-      await authenticate();
-    }
-  }
-
-  trakt.import_token(CACHED_TOKEN).then((newTokens) => {
-    CACHED_TOKEN = newTokens;
-
-    if (CACHED_TOKEN !== newTokens) {
-      console.log("[Trakt syncToTrakt] Refreshed token");
-      storeConfig(newTokens);
-    }
-  });
+  await validateToken();
 
   const historyType = type === "Episode" ? "episodes" : "movies";
   const searchType = type === "Episode" ? "episode" : "movie";
@@ -174,7 +226,7 @@ const syncToTrakt = async (body) => {
     };
   };
 
-  console.log(`[Trakt syncToTrakt] Searched for trakt id ...`);
+  console.log(`[Trakt syncToTrakt] Search for trakt id ...`);
 
   const traktId = await searchThingy();
 
@@ -218,6 +270,8 @@ router.post("/", async (req, res) => {
     completed: req.body.completed === "True",
     type: req.body.type,
   };
+
+  console.log(CACHED_TOKEN);
 
   console.log(
     `[Trakt post] Request body: ${JSON.stringify(
