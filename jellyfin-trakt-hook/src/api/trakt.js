@@ -5,6 +5,7 @@ const fs = require("fs");
 const router = express.Router();
 
 const CONFIG_DIR = process.env.CONFIG_DIR;
+const DEBUG_HEADERS = process.env.DEBUG_HEADERS;
 
 let options = {
   client_id: process.env.CLIENT_ID,
@@ -27,7 +28,7 @@ const loadConfig = () => {
       CACHED_TOKEN = JSON.parse(file);
       return true;
     } catch (error) {
-      console.error("Could load token from file");
+      console.error(`[Trakt loadConfig] Could load token from file`);
       return false;
     }
   }
@@ -44,13 +45,17 @@ const authenticate = async () => {
     );
     await trakt.poll_access(result);
   } catch (error) {
-    console.log(error);
+    console.error(
+      `[Trakt authenticate] Trakt authentication error: ${JSON.stringify(
+        error
+      )}`
+    );
   }
 
   const newToken = trakt.export_token();
 
   CACHED_TOKEN = newToken;
-  console.log("Requested new token");
+  console.log("[Trakt authenticate] Requested new token");
   storeConfig(newToken);
   return newToken;
 };
@@ -63,13 +68,17 @@ const syncToTrakt = async (body) => {
 
   if (!completed) {
     console.log(
-      `Provided video not completed. Ignoring. ${JSON.stringify(body)}`
+      `[Trakt syncToTrakt] Provided video not completed. Ignoring. ${JSON.stringify(
+        body
+      )}`
     );
     return "Not completed. Ignoring";
   }
 
   if (!tvdb && !imdb) {
-    console.log(`No imdb and tvdb provided. ${JSON.stringify(body)}`);
+    console.log(
+      `[Trakt syncToTrakt] No imdb and tvdb provided. ${JSON.stringify(body)}`
+    );
     return "No imdb and tvdb provided";
   }
 
@@ -83,7 +92,7 @@ const syncToTrakt = async (body) => {
     CACHED_TOKEN = newTokens;
 
     if (CACHED_TOKEN !== newTokens) {
-      console.log("Refreshed token");
+      console.log("[Trakt syncToTrakt] Refreshed token");
       storeConfig(newTokens);
     }
   });
@@ -165,7 +174,15 @@ const syncToTrakt = async (body) => {
     };
   };
 
+  console.log(`[Trakt syncToTrakt] Searched for trakt id ...`);
+
   const traktId = await searchThingy();
+
+  if (traktId) {
+    console.log(`[Trakt syncToTrakt] Found trakt id: ${traktId}`);
+  } else {
+    console.log(`[Trakt syncToTrakt] Did not find trakt id.`);
+  }
 
   const result = await trakt.sync.history.get({
     type: historyType,
@@ -175,9 +192,19 @@ const syncToTrakt = async (body) => {
   response.history = result;
 
   if (result.length <= 0) {
-    console.log(`Add watched: ${JSON.stringify(body)}`);
+    console.log(
+      `[Trakt syncToTrakt] Add watched (traktid: ${traktId} / imdb: ${imdb} / tvdb: ${tvdb})`
+    );
     const watchedResult = await addWatched();
+
+    console.log(
+      `[Trakt syncToTrakt] Successfully added (traktid: ${traktId} / imdb: ${imdb} / tvdb: ${tvdb})`
+    );
     response.addToWatched = watchedResult;
+  } else {
+    console.log(
+      `[Trakt syncToTrakt] Already watched (traktid: ${traktId} / imdb: ${imdb} / tvdb: ${tvdb})`
+    );
   }
 
   return response;
@@ -187,13 +214,20 @@ router.post("/", async (req, res) => {
   const expected = {
     imdb: req.body.imdb || null,
     tvdb: req.body.tvdb || null,
+    tmdb: req.body.tmdb || null,
     completed: req.body.completed === "True",
     type: req.body.type,
   };
 
   console.log(
-    `Request: ${JSON.stringify(req.body)} - ${JSON.stringify(req.headers)}`
+    `[Trakt post] Request body: ${JSON.stringify(
+      req.body
+    )} - Transformed: ${JSON.stringify(expected)}`
   );
+
+  if (DEBUG_HEADERS) {
+    console.log(`Headers: ${JSON.stringify(req.headers)}`);
+  }
 
   const result = await syncToTrakt(expected);
   res.json(result);
