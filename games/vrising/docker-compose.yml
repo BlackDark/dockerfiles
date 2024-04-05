@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+  vrising:
+    # build: . # Build from Dockerfile
+    container_name: vrising-test
+    image: test:test
+    network_mode: bridge
+    entrypoint: []
+    environment:
+      - TZ=Europe/Paris
+      - SERVERNAME=vrisingDocker
+    volumes:
+      - "./server:/mnt/vrising/server:rw"
+      - "./data:/mnt/vrising/persistentdata:rw"
+    ports:
+      - "9900:9876/udp"
+      - "9901:9877/udp"

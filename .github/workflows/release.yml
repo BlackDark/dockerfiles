@@ -2,8 +2,8 @@ name: Docker Builds
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 1 * * *"
+  # schedule:
+  #   - cron: "0 1 * * *"
   push:
     branches:
       - "main"
@@ -21,12 +21,63 @@ permissions:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      bitrix24-keepalive: ${{ steps.filter.outputs.bitrix24-keepalive }}
+      webde-keepalive: ${{ steps.filter.outputs.webde-keepalive }}
+      cf-record-refresh: ${{ steps.filter.outputs.cf-record-refresh }}
+      cron-dind: ${{ steps.filter.outputs.cron-dind }}
+      cron-s6: ${{ steps.filter.outputs.cron-s6 }}
+      jellyfin-trakt-hook: ${{ steps.filter.outputs.jellyfin-trakt-hook }}
+      speedtester: ${{ steps.filter.outputs.speedtester }}
+      games-vrising: ${{ steps.filter.outputs.games-vrising }}
+      packages: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            bitrix24-keepalive:
+              - 'bitrix24-keepalive/**'
+            cf-record-refresh:
+              - 'cf-record-refresh/**'
+            cron-dind:
+              - 'cron-dind/**'
+            cron-s6:
+              - 'cron-s6/**'
+            games-vrising:
+              - 'games/vrising/**'
+            jellyfin-trakt-hook:
+              - 'jellyfin-trakt-hook/**'
+            speedtester:
+              - 'speedtester/**'
+            webde-keepalive:
+              - 'webde-keepalive/**'
+
+  game-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      games-vrising: ${{ steps.filter.outputs.games-vrising }}
+      packages: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            vrising:
+              - 'games/vrising/**'
+
   build-cron-s6:
     strategy:
       matrix:
         folder:
           - cron-s6
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.crons6 == 'true' }}
     steps:
       # Get the repositery's code
       - name: Checkout
@@ -88,18 +139,20 @@ jobs:
       #     repository: pabloromeo/clusterplex_pms
       #     readme-filepath: ./README.md
       #     short-description: "PMS image for ClusterPlex"
+
   build-others:
     needs:
-      - build-cron-s6
+      - changes
     strategy:
       matrix:
-        folder:
-          - speedtester
-          - bitrix24-keepalive
-          - webde-keepalive
-          - cf-record-refresh
-          - cron-dind
-          - jellyfin-trakt-hook
+        folder: ${{ fromJSON(needs.changes.outputs.packages) }}
+        # folder:
+        #   - speedtester
+        #   - bitrix24-keepalive
+        #   - webde-keepalive
+        #   - cf-record-refresh
+        #   - cron-dind
+        #   - jellyfin-trakt-hook
     runs-on: ubuntu-latest
     steps:
       # Get the repositery's code
@@ -162,3 +215,46 @@ jobs:
       #     repository: pabloromeo/clusterplex_pms
       #     readme-filepath: ./README.md
       #     short-description: "PMS image for ClusterPlex"
+
+  build-games:
+    needs:
+      - game-changes
+    strategy:
+      matrix:
+        folder: ${{ fromJSON(needs.game-changes.outputs.packages) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Docker meta for PMS
+        id: meta_pms
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            blackdark93/dockerfiles-games-${{ matrix.folder }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+      - name: Build and push PMS
+        uses: docker/build-push-action@v3
+        with:
+          context: ./games/${{ matrix.folder }}
+          file: ./games/${{ matrix.folder }}/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta_pms.outputs.tags }}
+          labels: ${{ steps.meta_pms.outputs.labels }}
