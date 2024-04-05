@@ -31,7 +31,6 @@ jobs:
       cron-s6: ${{ steps.filter.outputs.cron-s6 }}
       jellyfin-trakt-hook: ${{ steps.filter.outputs.jellyfin-trakt-hook }}
       speedtester: ${{ steps.filter.outputs.speedtester }}
-      games-vrising: ${{ steps.filter.outputs.games-vrising }}
       packages: ${{ steps.filter.outputs.changes }}
     steps:
       - uses: actions/checkout@v4
@@ -47,8 +46,6 @@ jobs:
               - 'cron-dind/**'
             cron-s6:
               - 'cron-s6/**'
-            games-vrising:
-              - 'games/vrising/**'
             jellyfin-trakt-hook:
               - 'jellyfin-trakt-hook/**'
             speedtester:
@@ -69,6 +66,20 @@ jobs:
           filters: |
             vrising:
               - 'games/vrising/**'
+
+  echo:
+    needs:
+      - game-changes
+      - changes
+    runs-on: ubuntu-latest
+    env:
+      var1: ${{ needs.game-changes.outputs.packages }}
+      var3: ${{ needs.changes.outputs.packages }}
+    steps:
+      - run: |
+          echo $var1
+          echo $var2
+          echo $var3
 
   build-cron-s6:
     strategy:
@@ -126,7 +137,7 @@ jobs:
         with:
           context: ./${{ matrix.folder }}
           file: ./${{ matrix.folder }}/Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64 #,linux/arm/v7
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta_pms.outputs.tags }}
           labels: ${{ steps.meta_pms.outputs.labels }}
@@ -143,6 +154,7 @@ jobs:
   build-others:
     needs:
       - changes
+    if: ${{ needs.changes.outputs.packages != '[]' }}
     strategy:
       matrix:
         folder: ${{ fromJSON(needs.changes.outputs.packages) }}
@@ -219,6 +231,7 @@ jobs:
   build-games:
     needs:
       - game-changes
+    if: ${{ needs.game-changes.outputs.packages != '[]' }}
     strategy:
       matrix:
         folder: ${{ fromJSON(needs.game-changes.outputs.packages) }}
@@ -254,7 +267,7 @@ jobs:
         with:
           context: ./games/${{ matrix.folder }}
           file: ./games/${{ matrix.folder }}/Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta_pms.outputs.tags }}
           labels: ${{ steps.meta_pms.outputs.labels }}
