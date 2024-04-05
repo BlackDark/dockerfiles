@@ -31,7 +31,6 @@ jobs:
       cron-s6: ${{ steps.filter.outputs.cron-s6 }}
       jellyfin-trakt-hook: ${{ steps.filter.outputs.jellyfin-trakt-hook }}
       speedtester: ${{ steps.filter.outputs.speedtester }}
-      games-vrising: ${{ steps.filter.outputs.games-vrising }}
       packages: ${{ steps.filter.outputs.changes }}
     steps:
       - uses: actions/checkout@v4
@@ -47,8 +46,6 @@ jobs:
               - 'cron-dind/**'
             cron-s6:
               - 'cron-s6/**'
-            games-vrising:
-              - 'games/vrising/**'
             jellyfin-trakt-hook:
               - 'jellyfin-trakt-hook/**'
             speedtester:
