@@ -70,6 +70,20 @@ jobs:
             vrising:
               - 'games/vrising/**'
 
+  echo:
+    needs:
+      - game-changes
+      - changes
+    runs-on: ubuntu-latest
+    env:
+      var1: ${{ needs.game-changes.outputs.packages }}
+      var3: ${{ needs.changes.outputs.packages }}
+    steps:
+      - run: |
+          echo $var1
+          echo $var2
+          echo $var3
+
   build-cron-s6:
     strategy:
       matrix:
@@ -143,6 +157,7 @@ jobs:
   build-others:
     needs:
       - changes
+    if: ${{ needs.changes.outputs.packages != '[]' }}
     strategy:
       matrix:
         folder: ${{ fromJSON(needs.changes.outputs.packages) }}
@@ -219,6 +234,7 @@ jobs:
   build-games:
     needs:
       - game-changes
+    if: ${{ needs.game-changes.outputs.packages != '[]' }}
     strategy:
       matrix:
         folder: ${{ fromJSON(needs.game-changes.outputs.packages) }}
