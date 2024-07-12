@@ -25,6 +25,7 @@ ENV SOPS_VERSION=v3.9.0
 ENV AGE_VERSION=v1.2.0
 
 ENV GITHUB_URL=https://github.com
+ENV BIN_TARGET=/usr/bin
 
 RUN <<EOF
   if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
@@ -51,19 +52,19 @@ RUN <<EOF
   echo "$GITHUB_URL/getsops/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.$OS.$PACKAGE_ARCH"
   echo "$GITHUB_URL/FiloSottile/age/releases/download/${AGE_VERSION}/age-${AGE_VERSION}-$OS-$PACKAGE_ARCH.tar.gz"
 
-  mkdir -p /usr/local/bin
+  mkdir -p $BIN_TARGET
 
   # install sops
-  curl -s -L -o /usr/local/bin/sops $GITHUB_URL/getsops/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.$OS.$PACKAGE_ARCH
-  chmod +x /usr/local/bin/sops
+  curl -s -L -o $BIN_TARGET/sops $GITHUB_URL/getsops/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.$OS.$PACKAGE_ARCH
+  chmod +x $BIN_TARGET/sops
 
   # install AGE
   curl -s -L -o "age-archive.tar.gz" $GITHUB_URL/FiloSottile/age/releases/download/${AGE_VERSION}/age-${AGE_VERSION}-$OS-$PACKAGE_ARCH.tar.gz
   ls -lah
   tar -xzvf age-archive.tar.gz && rm -rf age-archive.tar.gz
-  mv age/age /usr/local/bin
-  mv age/age-keygen /usr/local/bin
+  mv age/age $BIN_TARGET
+  mv age/age-keygen $BIN_TARGET
   rm -rf age
-  chmod +x /usr/local/bin/age
-  chmod +x /usr/local/bin/age-keygen
+  chmod +x $BIN_TARGET/age
+  chmod +x $BIN_TARGET/age-keygen
 EOF
