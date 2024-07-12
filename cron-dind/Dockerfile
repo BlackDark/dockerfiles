@@ -2,6 +2,8 @@ FROM blackdark93/dockerfiles-cron-s6:main
 
 LABEL MAINTAINER="blackdark93"
 
+ARG TARGETPLATFORM
+
 RUN apt-get update \
   && apt install -y ca-certificates curl gnupg \
   && rm -rf /var/lib/apt/lists/* \
@@ -15,3 +17,53 @@ RUN apt-get update \
   && apt-get update  \
   && apt install -y docker-ce-cli \
   && rm -rf /var/lib/apt/lists/*
+
+
+# renovate: datasource=github-releases depName=getsops/sops versioning=loose
+ENV SOPS_VERSION=v3.9.0
+# renovate: datasource=github-releases depName=FiloSottile/age versioning=loose
+ENV AGE_VERSION=v1.2.0
+
+ENV GITHUB_URL=https://github.com
+
+RUN <<EOF
+  if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
+  ARCHITECTURE=amd64;
+  OS=linux
+  PACKAGE_ARCH=amd64
+  elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then
+  ARCHITECTURE=arm;
+  OS=linux
+  PACKAGE_ARCH=arm
+  elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then
+  ARCHITECTURE=aarch64;
+  OS=linux
+  PACKAGE_ARCH=arm64
+  else
+  ARCHITECTURE=amd64;
+  OS=linux
+  PACKAGE_ARCH=arm64
+  fi
+  export ARCHITECTURE=$ARCHITECTURE
+  export OS=$OS
+  export PACKAGE_ARCH=$PACKAGE_ARCH
+
+  echo "$GITHUB_URL/getsops/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.$OS.$PACKAGE_ARCH"
+  echo "$GITHUB_URL/FiloSottile/age/releases/download/${AGE_VERSION}/age-${AGE_VERSION}-$OS-$PACKAGE_ARCH.tar.gz"
+
+  mkdir -p /usr/local/bin
+
+  # install sops
+  curl -s -L -o /usr/local/bin/sops $GITHUB_URL/getsops/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.$OS.$PACKAGE_ARCH
+  chmod +x /usr/local/bin/sops
+
+  # install AGE
+  curl -s -L -o "age-archive.tar.gz" $GITHUB_URL/FiloSottile/age/releases/download/${AGE_VERSION}/age-${AGE_VERSION}-$OS-$PACKAGE_ARCH.tar.gz
+  ls -lah
+  tar -xzvf age-archive.tar.gz && rm -rf age-archive.tar.gz
+  mv age/age /usr/local/bin
+  mv age/age-keygen /usr/local/bin
+  rm -rf age
+  chmod +x /usr/local/bin/age
+  chmod +x /usr/local/bin/age-keygen
+EOF
