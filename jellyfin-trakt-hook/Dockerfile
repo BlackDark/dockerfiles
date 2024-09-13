@@ -1,5 +1,5 @@
 # https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md
-FROM node:22.7.0-alpine AS base
+FROM node:22.8.0-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
