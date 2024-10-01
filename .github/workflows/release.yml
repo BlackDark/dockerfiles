@@ -66,6 +66,8 @@ jobs:
           filters: |
             vrising:
               - 'games/vrising/**'
+            azure-hibernator:
+              - 'games/azure-hibernator/**'
 
   echo:
     needs:
