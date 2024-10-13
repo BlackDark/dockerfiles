@@ -19,9 +19,9 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 
-# renovate: datasource=github-releases depName=getsops/sops versioning=loose
+# renovate: datasource=github-releases packageName=getsops/sops versioning=loose
 ENV SOPS_VERSION=v3.9.0
-# renovate: datasource=github-releases depName=FiloSottile/age versioning=loose
+# renovate: datasource=github-releases packageName=FiloSottile/age versioning=loose
 ENV AGE_VERSION=v1.2.0
 
 ENV GITHUB_URL=https://github.com

@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
   xz-utils \
  && rm -rf /var/lib/apt/lists/*
 
-# renovate: datasource=github-releases depName=just-containers/s6-overlay versioning=loose
+# renovate: datasource=github-releases packageName=just-containers/s6-overlay versioning=loose
 ARG S6_OVERLAY_VERSION=3.2.0.0
 
 ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
