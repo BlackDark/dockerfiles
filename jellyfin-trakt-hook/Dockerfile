@@ -1,31 +1,62 @@
 # https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md
-FROM node:22.9.0-alpine AS base
-ENV PNPM_HOME="/pnpm"
+# TODO because multiarch build has problems with QEMU and Node we cannot use alpine here: https://github.com/nodejs/docker-node/issues/1798
+FROM node:22.9.0-slim AS base
+WORKDIR /app
+
+ENV PNPM_HOME="/opt/pnpm"
+ENV COREPACK_HOME="/opt/corepack"
 ENV PATH="$PNPM_HOME:$PATH"
 
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apk add --no-cache tini
+COPY package.json pnpm-lock.yaml ./
 
+# Do it here to add the packageManager field to the package.json
 RUN corepack enable \
-    && corepack prepare pnpm@9 --activate
+    && corepack prepare pnpm@9 --activate \
+    && corepack use pnpm@9
 
-RUN mkdir -p /home/node/app/node_modules && chown -R 1000:1000 /home/node/app
-WORKDIR /home/node/app
+RUN pnpm config set store-dir ~/.pnpm-store
 
-COPY --chown=1000:1000 package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm install --frozen-lockfile
 
-USER 1000
+FROM base AS builder
+COPY src src/
+COPY esbuild.js ./
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+RUN pnpm run build
 
-FROM base
-RUN corepack use pnpm@9
+FROM base AS dev
 
-COPY --from=prod-deps /home/node/app/node_modules /home/node/app/node_modules
-COPY --chown=1000:1000 src ./src
+ENV NODE_ENV=development
+ENV CLIENT_ID=
+ENV CLIENT_SECRET=
+ENV CONFIG_DIR=
+
+# manually mount src etc
+
+CMD [ "pnpm", "start" ]
+
+# https://github.com/evanw/esbuild/issues/1921
+FROM node:22.9.0-alpine AS prod
+WORKDIR /app
+
+
+RUN apk add --no-cache libstdc++ dumb-init
+
+# TODO maybe in future. Results in breaking change
+#USER node
+
+COPY --from=builder /app/bundle.cjs /app/index.js
+
+ENV CLIENT_ID=
+ENV CLIENT_SECRET=
+ENV CONFIG_DIR=
 
 EXPOSE 5000
+USER 1000
 
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD [ "node", "src/index.js" ]
+# Run with dumb-init to not start node with PID=1, since Node.js was not designed to run as PID 1
+CMD ["dumb-init", "node", "index.js"]
