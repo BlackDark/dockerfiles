@@ -52,6 +52,8 @@ jobs:
               - 'speedtester/**'
             webde-keepalive:
               - 'webde-keepalive/**'
+            zstd:
+              - 'zstd/**'
 
   game-changes:
     runs-on: ubuntu-latest
@@ -216,7 +218,7 @@ jobs:
         with:
           context: ./${{ matrix.folder }}
           file: ./${{ matrix.folder }}/Dockerfile
-          platforms: linux/amd64,linux/arm64 #,linux/arm/v7
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta_pms.outputs.tags }}
           labels: ${{ steps.meta_pms.outputs.labels }}
