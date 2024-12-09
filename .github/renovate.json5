@@ -1,6 +1,20 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["config:recommended"],
+  packageRules: [
+    {
+      matchDatasources: ["npm"],
+      matchUpdateTypes: ["minor", "patch"],
+      groupName: "all npm updates (without major)",
+      groupSlug: "all-npm",
+    },
+    {
+      matchDatasources: ["docker"],
+      matchUpdateTypes: ["minor", "patch"],
+      groupName: "all docker updates (without major)",
+      groupSlug: "all-docker",
+    },
+  ],
   customManagers: [
     {
       customType: "regex",
