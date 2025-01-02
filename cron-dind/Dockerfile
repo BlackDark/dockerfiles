@@ -20,7 +20,7 @@ RUN apt-get update \
 
 
 # renovate: datasource=github-releases packageName=getsops/sops versioning=loose
-ENV SOPS_VERSION=v3.9.2
+ENV SOPS_VERSION=v3.9.3
 # renovate: datasource=github-releases packageName=FiloSottile/age versioning=loose
 ENV AGE_VERSION=v1.2.1
 
