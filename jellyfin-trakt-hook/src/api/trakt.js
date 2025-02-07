@@ -1,7 +1,6 @@
 const express = require("express");
 const Trakt = require("trakt.tv");
 const fs = require("fs");
-const internal = require("stream");
 
 const router = express.Router();
 
@@ -31,7 +30,7 @@ const loadConfig = () => {
       CACHED_TOKEN = JSON.parse(file);
       return true;
     } catch (error) {
-      console.error(`[Trakt loadConfig] Could load token from file`);
+      console.error(error, `[Trakt loadConfig] Could load token from file`);
       return false;
     }
   }
@@ -108,8 +107,8 @@ const validateToken = async () => {
       );
 
       try {
-        const refreshedToken = await trakt.refresh_token();
-        const newToken = await trakt.export_token();
+        await trakt.refresh_token();
+        const newToken = trakt.export_token();
 
         if (JSON.stringify(CACHED_TOKEN) !== JSON.stringify(newToken)) {
           console.log("[Trakt validateToken] Refreshed token");
@@ -165,36 +164,36 @@ const syncToTrakt = async (body) => {
 
     if (searchResult.length > 0) {
       // maybe do something about scoure etc
-      const example = [
-        {
-          type: "episode",
-          score: 1000,
-          episode: {
-            season: 1,
-            number: 3,
-            title: "Tokiwadai is Targeted",
-            ids: {
-              trakt: 755412,
-              tvdb: 1191341,
-              imdb: "tt1530846",
-              tmdb: 749403,
-              tvrage: 1064860610,
-            },
-          },
-          show: {
-            title: "A Certain Scientific Railgun",
-            year: 2009,
-            ids: {
-              trakt: 30843,
-              slug: "a-certain-scientific-railgun",
-              tvdb: 114921,
-              imdb: "tt1515996",
-              tmdb: 30977,
-              tvrage: null,
-            },
-          },
-        },
-      ];
+      // const example = [
+      //   {
+      //     type: "episode",
+      //     score: 1000,
+      //     episode: {
+      //       season: 1,
+      //       number: 3,
+      //       title: "Tokiwadai is Targeted",
+      //       ids: {
+      //         trakt: 755412,
+      //         tvdb: 1191341,
+      //         imdb: "tt1530846",
+      //         tmdb: 749403,
+      //         tvrage: 1064860610,
+      //       },
+      //     },
+      //     show: {
+      //       title: "A Certain Scientific Railgun",
+      //       year: 2009,
+      //       ids: {
+      //         trakt: 30843,
+      //         slug: "a-certain-scientific-railgun",
+      //         tvdb: 114921,
+      //         imdb: "tt1515996",
+      //         tmdb: 30977,
+      //         tvrage: null,
+      //       },
+      //     },
+      //   },
+      // ];
 
       if (searchType === "episode") {
         return searchResult[0].episode.ids.trakt;

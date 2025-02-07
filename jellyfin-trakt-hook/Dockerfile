@@ -11,15 +11,16 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package.json pnpm-lock.yaml ./
+RUN npm install -g corepack
 
 # Do it here to add the packageManager field to the package.json
 RUN corepack enable \
-    && corepack prepare pnpm@9 --activate \
-    && corepack use pnpm@9
+    && corepack prepare pnpm@10 --activate \
+    && corepack use pnpm@10
 
 RUN pnpm config set store-dir ~/.pnpm-store
 
+COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm install --frozen-lockfile
 
 FROM base AS builder
@@ -31,9 +32,9 @@ RUN pnpm run build
 FROM base AS dev
 
 ENV NODE_ENV=development
-ENV CLIENT_ID=
-ENV CLIENT_SECRET=
-ENV CONFIG_DIR=
+#ENV CLIENT_ID=
+#ENV CLIENT_SECRET=
+#ENV CONFIG_DIR=
 
 # manually mount src etc
 
@@ -51,9 +52,9 @@ RUN apk add --no-cache libstdc++ dumb-init
 
 COPY --from=builder /app/bundle.cjs /app/index.js
 
-ENV CLIENT_ID=
-ENV CLIENT_SECRET=
-ENV CONFIG_DIR=
+# ENV CLIENT_ID=
+# ENV CLIENT_SECRET=
+# ENV CONFIG_DIR=
 
 EXPOSE 5000
 USER 1000
