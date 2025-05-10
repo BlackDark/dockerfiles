@@ -4,7 +4,7 @@
 FROM alpine
 WORKDIR /app
 # renovate: datasource=github-releases packageName=facebook/zstd
-ARG ZSTD_VERSION=1.5.6
+ARG ZSTD_VERSION=1.5.7
 RUN <<EOF
     apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
         "zstd~=${ZSTD_VERSION}"
