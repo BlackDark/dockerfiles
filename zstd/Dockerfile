@@ -1,12 +1,13 @@
 # syntax=docker/dockerfile:1
 
 # First version with just installing with apk 
-FROM alpine
+FROM alpine:3.21.3
+
 WORKDIR /app
 # renovate: datasource=github-releases packageName=facebook/zstd
 ARG ZSTD_VERSION=1.5.7
 RUN <<EOF
-    apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
+    apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main \
         "zstd~=${ZSTD_VERSION}"
 EOF
 
