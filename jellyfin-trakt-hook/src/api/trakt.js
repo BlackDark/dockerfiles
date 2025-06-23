@@ -270,7 +270,7 @@ router.post("/", async (req, res) => {
     type: req.body.type,
   };
 
-  console.log(CACHED_TOKEN);
+  // console.log(CACHED_TOKEN);
 
   console.log(
     `[Trakt post] Request body: ${JSON.stringify(
