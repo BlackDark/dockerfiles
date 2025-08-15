@@ -1,4 +1,4 @@
-FROM python:3.13.5-slim-bullseye
+FROM python:3.13.6-slim-bullseye
 WORKDIR /app
 
 RUN pip install cloudflare schedule
