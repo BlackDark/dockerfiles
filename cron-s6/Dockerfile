@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y \
   uuid-runtime \
   cron \
   xz-utils \
- && rm -rf /var/lib/apt/lists/*
+  && apt upgrade -y \
+  && rm -rf /var/lib/apt/lists/*
 
 # renovate: datasource=github-releases packageName=just-containers/s6-overlay versioning=loose
 ARG S6_OVERLAY_VERSION=3.2.1.0
