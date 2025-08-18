@@ -1,12 +1,15 @@
-FROM blackdark93/dockerfiles-cron-s6:main
+FROM blackdark93/dockerfiles-cron-s6:main@sha256:911c50b730db5ed1108c501b44e1cd9fe56d1f2c49fa893c5b84f103aa8ea696
 
 LABEL MAINTAINER="blackdark93"
 
 ARG TARGETPLATFORM
 
+# renovate: datasource=github-releases packageName=docker/cli versioning=loose
+ENV DOCKER_VERSION=v28.3.3
+
 RUN apt-get update \
   && apt install -y ca-certificates curl gnupg \
-  && rm -rf /var/lib/apt/lists/* \
+  && apt upgrade -y \
   && install -m 0755 -d /etc/apt/keyrings \
   && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
   && chmod a+r /etc/apt/keyrings/docker.gpg \
