@@ -26,11 +26,11 @@
     "trakt.tv": "8.2.0"
   },
   "devDependencies": {
-    "@eslint/js": "9.33.0",
+    "@eslint/js": "9.34.0",
     "esbuild": "0.25.9",
     "eslint": "^9.29.0",
     "globals": "16.3.0",
-    "jest": "30.0.5",
+    "jest": "30.1.1",
     "nodemon": "3.1.10",
     "supertest": "7.1.4"
   }
