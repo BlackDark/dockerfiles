@@ -33,7 +33,7 @@ jobs:
       speedtester: ${{ steps.filter.outputs.speedtester }}
       packages: ${{ steps.filter.outputs.changes }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -61,7 +61,7 @@ jobs:
       games-vrising: ${{ steps.filter.outputs.games-vrising }}
       packages: ${{ steps.filter.outputs.changes }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -96,7 +96,7 @@ jobs:
     steps:
       # Get the repositery's code
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
@@ -173,7 +173,7 @@ jobs:
     steps:
       # Get the repositery's code
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
@@ -242,7 +242,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
