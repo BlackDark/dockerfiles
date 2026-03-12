@@ -10,3 +10,11 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 # install instruction: https://www.speedtest.net/apps/cli
 # https://packagecloud.io/ookla/speedtest-cli/install
+
+# Optional: set a specific speedtest server ID (default: auto-select)
+# ENV SPEEDTEST_SERVER_ID=
+
+COPY run-speedtest.sh /usr/local/bin/run-speedtest
+RUN chmod +x /usr/local/bin/run-speedtest
+
+COPY cronfile /app/schedules/speedtester
