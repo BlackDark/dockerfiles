@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 LABEL MAINTAINER="blackdark93"
 
 RUN apt-get update && apt-get install -y \
