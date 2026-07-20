@@ -1,4 +1,4 @@
-FROM blackdark93/dockerfiles-cron-s6:main@sha256:911c50b730db5ed1108c501b44e1cd9fe56d1f2c49fa893c5b84f103aa8ea696
+FROM blackdark93/dockerfiles-cron-s6:main@sha256:dee857d91c5257750b096cfa207fe3511dfa0388b18ec91f8eb61733829c8673
 
 LABEL MAINTAINER="blackdark93"
 
