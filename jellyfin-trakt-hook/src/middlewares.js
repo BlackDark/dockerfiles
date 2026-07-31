@@ -8,6 +8,7 @@ function notFound(req, res, next) {
 function errorHandler(err, req, res, next) {
   /* eslint-enable no-unused-vars */
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+  console.error(`[errorHandler] ${req.method} ${req.originalUrl} failed:`, err);
   res.status(statusCode);
   res.json({
     message: err.message,

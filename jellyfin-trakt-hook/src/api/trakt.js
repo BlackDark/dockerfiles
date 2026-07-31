@@ -6,11 +6,12 @@ const router = express.Router();
 
 const CONFIG_DIR = process.env.CONFIG_DIR;
 const DEBUG_HEADERS = process.env.DEBUG_HEADERS;
+const TRAKT_DEBUG = process.env.TRAKT_DEBUG || false;
 
 let options = {
   client_id: process.env.CLIENT_ID,
   client_secret: process.env.CLIENT_SECRET,
-  debug: process.env.TRAKT_DEBUG || false,
+  debug: TRAKT_DEBUG,
 };
 
 const trakt = new Trakt(options);
@@ -73,10 +74,14 @@ const validateToken = async () => {
   }
 
   if (!TRAKT_TOKEN_IMPORTED) {
-    console.log("[Trakt validateToken] Import token into trakt ...");
+    if (TRAKT_DEBUG) {
+      console.log("[Trakt validateToken] Import token into trakt ...");
+    }
     try {
       const newTokens = await trakt.import_token(CACHED_TOKEN);
-      console.log("[Trakt validateToken] Imported token");
+      if (TRAKT_DEBUG) {
+        console.log("[Trakt validateToken] Imported token");
+      }
 
       if (JSON.stringify(CACHED_TOKEN) !== JSON.stringify(newTokens)) {
         console.log("[Trakt validateToken] Refreshed token");
