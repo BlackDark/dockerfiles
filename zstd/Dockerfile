@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # First version with just installing with apk 
-FROM alpine:3.24.1
+FROM alpine:3.24.2
 
 WORKDIR /app
 # renovate: datasource=github-releases packageName=facebook/zstd
