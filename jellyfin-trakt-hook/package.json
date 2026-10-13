@@ -20,7 +20,7 @@
   "dependencies": {
     "cors": "2.8.6",
     "dotenv": "17.4.2",
-    "express": "5.2.1",
+    "express": "5.3.0",
     "helmet": "8.3.0",
     "morgan": "1.12.1",
     "trakt.tv": "8.2.0"
