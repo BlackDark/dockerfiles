@@ -24,8 +24,8 @@ importers:
         specifier: 1.12.1
         version: 1.12.1(supports-color@5.5.0)
       trakt.tv:
-        specifier: 8.2.0
-        version: 8.2.0
+        specifier: 8.3.0
+        version: 8.3.0
     devDependencies:
       '@eslint/js':
         specifier: 10.0.1
@@ -37,8 +37,8 @@ importers:
         specifier: ^10.0.0
         version: 10.14.0(supports-color@5.5.0)
       globals:
-        specifier: 17.13.0
-        version: 17.13.0
+        specifier: 17.14.0
+        version: 17.14.0
       jest:
         specifier: 30.5.2
         version: 30.5.2(@types/node@22.5.4)(supports-color@5.5.0)
@@ -1434,8 +1434,8 @@ packages:
     resolution: {integrity: sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==}
     engines: {node: '>=4'}
 
-  globals@17.13.0:
-    resolution: {integrity: sha512-RwMTC61u7hrG3ZJMkZQOK4JLJrKS8QtoTii63EmWvFXHqycY9FObBJQCbsLxSO8kjKhWE5kV1GC+Vb1g3RI0Zg==}
+  globals@17.14.0:
+    resolution: {integrity: sha512-UtdkTVyAJePQv0J2M9Xe4L0ruNSDV314XiIJsADI2Zf40bcdAonE/D/OhAU8AT99oij9mhLByb+NvA3QWZYgCg==}
     engines: {node: '>=18'}
 
   gopd@1.2.0:
@@ -2237,8 +2237,8 @@ packages:
     resolution: {integrity: sha512-r0eojU4bI8MnHr8c5bNo7lJDdI2qXlWWJk6a9EAFG7vbhTjElYhBVS3/miuE0uOuoLdb8Mc/rVfsmm6eo5o9GA==}
     hasBin: true
 
-  trakt.tv@8.2.0:
-    resolution: {integrity: sha512-Jlx+DQhcoIy/VSye7f/qWK9LfhSjwi4gJ3DdFrnYito/rtcwdv3TXgnB3fwqOlBc5yM0/jtuuL1zNialLJQaBw==}
+  trakt.tv@8.3.0:
+    resolution: {integrity: sha512-2wHWv1n2zflwd8Ggl5/0fsGPC3HlmcnOZgGVTMdac0mFMDrWJbXBGbA1+Fsbj0JXzaioyo9bIR5h6aKjBeWOlA==}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -3781,7 +3781,7 @@ snapshots:
 
   globals@11.12.0: {}
 
-  globals@17.13.0: {}
+  globals@17.14.0: {}
 
   gopd@1.2.0: {}
 
@@ -4735,7 +4735,7 @@ snapshots:
 
   touch@3.1.1: {}
 
-  trakt.tv@8.2.0:
+  trakt.tv@8.3.0:
     dependencies:
       got: 11.8.6
 
