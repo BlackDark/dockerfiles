@@ -1,24 +1,21 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended"],
+  extends: ["github>blackdark/renovate-base//default.json5"],
+  rebaseWhen: "behind-base-branch",
+  separateMultipleMajor: true,
   packageRules: [
     {
-      matchDatasources: ["npm"],
-      matchUpdateTypes: ["minor", "patch"],
-      groupName: "all npm updates (without major)",
-      groupSlug: "all-npm",
-    },
-    {
-      matchDatasources: ["docker"],
-      matchUpdateTypes: ["minor", "patch"],
-      groupName: "all docker updates (without major)",
-      groupSlug: "all-docker",
+      description: "Majors: one PR each, merged by hand",
+      groupName: null,
+      matchUpdateTypes: ["major"],
+      addLabels: ["major"],
+      automerge: false,
     },
   ],
   customManagers: [
     {
       customType: "regex",
-      description: "Update _VERSION variables in Dockerfiles",
+      description: "Dockerfile `# renovate:` ENV/ARG *_VERSION pins",
       managerFilePatterns: [
         "/(^|/|\\.)Dockerfile$/",
         "/(^|/)Dockerfile\\.[^/]*$/",
