@@ -1,5 +1,5 @@
 # no arm builds
-FROM steamcmd/steamcmd:ubuntu-22
+FROM steamcmd/steamcmd:ubuntu-22@sha256:7d0992c09257ad38d46f335d20d2a7b2c6a96bb822363ee8f570862683bee09b
 LABEL maintainer="Tim Chaubet"
 VOLUME ["/mnt/vrising/server", "/mnt/vrising/persistentdata"]
 
