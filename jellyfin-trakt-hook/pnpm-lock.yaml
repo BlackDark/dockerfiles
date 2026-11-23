@@ -34,7 +34,7 @@ importers:
         specifier: 0.28.2
         version: 0.28.2
       eslint:
-        specifier: ^10.0.0
+        specifier: 10.15.0
         version: 10.15.0(supports-color@5.5.0)
       globals:
         specifier: 17.14.0
